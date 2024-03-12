@@ -66,7 +66,7 @@ public class AccountController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping("home")
     public String clientIndex(){
         return "client_index";
     }
@@ -77,14 +77,37 @@ public class AccountController {
     }
 
     @PostMapping("reset_password")
-    public String resetPassword(@RequestParam String username){
+    public String resetPassword(String username){
         sendEmail("Reset Password: ", "http://localhost:8080/change-password/" + username);
         return "client_index";
     }
 
     @GetMapping("change-password/{username}")
-    public String changePassword(String username){
+    public String changePassword(@PathVariable String username, Model model){
+        Account account = accountService.getByUsername(username);
+
+        if (account != null){
+            AccountDTO accountDTO = new AccountDTO();
+            accountDTO.setUsername(account.getUsername());
+
+            model.addAttribute("accountDTO",accountDTO);
+        }
         return "change-password";
+    }
+
+    @PostMapping("change-password/save")
+    public String savePassword(@RequestParam String username,
+                               @RequestParam String password){
+        Account account = accountService.getByUsername(username);
+
+        password = new BCryptPasswordEncoder().encode(password);
+        account.setPassword(password);
+
+        accountService.save(account);
+        if (accountService.save(account)){
+            System.out.println("save");
+        }
+        return "redirect:/home";
     }
 
     @GetMapping("account")
@@ -94,7 +117,7 @@ public class AccountController {
         log.info("Get all account");
         log.error("account id to delete not found");
 
-        //sendEmail();
+        //sendEmail("Guest who am i?", "WQEQWEQWEQWEWQEWEQWEQWEWQEQWEQWEQWQ");
 
         List<Account> accounts = accountService.getAll();
 

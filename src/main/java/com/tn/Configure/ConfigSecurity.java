@@ -39,8 +39,10 @@ public class ConfigSecurity {
         httpSecurity.csrf().disable();
 
         httpSecurity.authorizeRequests().requestMatchers("/").permitAll();
+        httpSecurity.authorizeRequests().requestMatchers("/home").permitAll();
         httpSecurity.authorizeRequests().requestMatchers("/reset_password").permitAll();
-        httpSecurity.authorizeRequests().requestMatchers("/change_password/**").permitAll();
+        httpSecurity.authorizeRequests().requestMatchers("/change-password/save").permitAll();
+        httpSecurity.authorizeRequests().requestMatchers("/change-password/**").permitAll();
 
         httpSecurity.authorizeRequests().requestMatchers("account/add").permitAll();
         httpSecurity.authorizeRequests().requestMatchers(HttpMethod.POST,"account/save").permitAll();

@@ -16,4 +16,6 @@ public interface AccountService extends UserDetailsService {
     Account getById(int id);
 
     List<Account> search(String keyword);
+
+    Account getByUsername(String username);
 }

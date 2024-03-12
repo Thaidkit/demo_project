@@ -23,9 +23,10 @@
 
         <div class="form-floating w-50 m-auto mb-3">
             <select class="form-select" name="role" aria-label="Default select example">
-                <option selected>Choose Role</option>
-                <option value="1">ADMIN</option>
-                <option value="2">USER</option>
+                <option value="USER" th:if="${accountDTO.role.toString().equals('USER')}" selected>USER</option>
+                <option value="USER" th:if="${!accountDTO.role.toString().equals('USER')}">USER</option>
+                <option value="ADMIN" th:if="${accountDTO.role.toString().equals('ADMIN')}" selected>ADMIN</option>
+                <option value="ADMIN" th:if="${!accountDTO.role.toString().equals('ADMIN')}">ADMIN</option>
             </select>
             <label>Role</label>
         </div>
@@ -41,11 +42,11 @@
 
         <div class="form-floating w-50 m-auto mb-3">
             <select class="form-select" name="departmentId" aria-label="Default select example">
-                <option th:value = "${accountDTO.departmentName}"></option>
-                <option th:each="obj:${departmentDTOS}" th:text="${obj.departmentName}" th:value="${obj.id}"></option>
+                <option selected value="">Choose Department</option>
+                <option th:each="obj:${departmentDTOS}" th:text = "${obj.departmentName}" th:value="${obj.id}"></option>
             </select>
-            <label>Department</label>
         </div>
+
         <div class="text-center">
             <button type="submit" class="btn btn-primary">Save</button>
         </div>

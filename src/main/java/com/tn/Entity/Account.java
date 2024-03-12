@@ -40,4 +40,5 @@ public class Account extends AuditEntity{
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
+
 }

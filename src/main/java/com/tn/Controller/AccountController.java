@@ -9,7 +9,10 @@ import com.tn.Repository.AccountRepository;
 import com.tn.Service.AccountService;
 import com.tn.Service.DepartmentService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,33 +34,69 @@ public class AccountController {
     private AccountService accountService;
     private DepartmentService departmentService;
 
+    private JavaMailSender javaMailSender;
+
+    @Value("${spring.mail.username}") //lay gia tri mail tu properties truyen vao object sender
+    private String sender;
+
+
     public AccountController(AccountService accountService,
-                             DepartmentService departmentService){
+                             DepartmentService departmentService,
+                             JavaMailSender javaMailSender){
         this.accountService = accountService;
         this.departmentService = departmentService;
+        this.javaMailSender = javaMailSender;
     }
 
+    private void sendEmail(String subject, String content) {
+        try {
+            // Creating a simple mail message
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+
+            // Setting up necessary details
+            mailMessage.setFrom(sender);
+            mailMessage.setTo("sktt1thai2003@gmail.com");
+            mailMessage.setSubject(subject);
+            mailMessage.setText(content);
+
+            // Sending the mail
+            javaMailSender.send(mailMessage);
+        } catch (Exception e) {
+            System.out.println("Send email fail");
+        }
+    }
+
+    @GetMapping("")
+    public String clientIndex(){
+        return "client_index";
+    }
+
+    @GetMapping("/reset_password")
+    public String resetPassword(){
+        return "reset_password";
+    }
+
+    @PostMapping("reset_password")
+    public String resetPassword(@RequestParam String username){
+        sendEmail("Reset Password: ", "http://localhost:8080/change-password/" + username);
+        return "client_index";
+    }
+
+    @GetMapping("change-password/{username}")
+    public String changePassword(String username){
+        return "change-password";
+    }
 
     @GetMapping("account")
-    public String getAll(@RequestParam(defaultValue = "1")  int page, Model model){
+    public String getAll(Model model){
 
-        //vi du ve log - app.og
+        //vi du ve log - app.log
         log.info("Get all account");
         log.error("account id to delete not found");
 
+        //sendEmail();
+
         List<Account> accounts = accountService.getAll();
-
-        int pageSize = 5; // Số lượng tài khoản trên mỗi trang
-
-        int totalAccounts = accounts.size();
-        int totalPages = (int) Math.ceil((double) totalAccounts / pageSize);
-
-        // Tính toán chỉ mục bắt đầu và kết thúc của danh sách tài khoản trên trang hiện tại
-        int startIndex = (page - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, totalAccounts);
-
-        List<Account> pagedAccounts = accounts.subList(startIndex, endIndex);
-
 
         List<AccountDTO> accountDTOS = new ArrayList<>();
 
@@ -76,8 +115,7 @@ public class AccountController {
             accountDTOS.add(accountDTO);
         });
         model.addAttribute("accountDTOS", accountDTOS);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
+
         return "account_list";
     }
 
@@ -154,12 +192,19 @@ public class AccountController {
     @PostMapping("account/update")
     public String update(@RequestParam Integer id,
                          @RequestParam String fullName,
-                         @RequestParam String username) {
+                         @RequestParam String username,
+                         @RequestParam String role) {
 
         Account account = accountService.getById(id);
         account.setFullName(fullName);
         account.setUsername(username);
 
+        if (role.toString().equals("USER")){
+            account.setRole(AccountRole.USER);
+        }
+        if (role.toString().equals("ADMIN")){
+            account.setRole(AccountRole.ADMIN);
+        }
 
         accountService.save(account);
 
@@ -192,6 +237,9 @@ public class AccountController {
                 accountDTOS.add(accountDTO);
             });
             model.addAttribute("accountDTOS", accountDTOS);
+            //truyen gia tri tim kiem ra o input (view)
+            // khi nhap gia tri tim kiem thi gia tri van hien thi, chu khong mat di
+            model.addAttribute("keyword", keyword);
             return "account_list";
         } else {
             return "redirect:/account";

@@ -38,6 +38,10 @@ public class ConfigSecurity {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.csrf().disable();
 
+        httpSecurity.authorizeRequests().requestMatchers("/").permitAll();
+        httpSecurity.authorizeRequests().requestMatchers("/reset_password").permitAll();
+        httpSecurity.authorizeRequests().requestMatchers("/change_password/**").permitAll();
+
         httpSecurity.authorizeRequests().requestMatchers("account/add").permitAll();
         httpSecurity.authorizeRequests().requestMatchers(HttpMethod.POST,"account/save").permitAll();
         httpSecurity.authorizeRequests().anyRequest().authenticated();

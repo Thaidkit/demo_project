@@ -4,6 +4,7 @@ import com.tn.Entity.Account;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AccountService extends UserDetailsService {
     List<Account> getAll();
@@ -12,5 +13,7 @@ public interface AccountService extends UserDetailsService {
 
     boolean delete(int id);
 
+    Account getById(int id);
 
+    List<Account> search(String keyword);
 }

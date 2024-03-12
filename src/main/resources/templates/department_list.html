@@ -42,6 +42,7 @@
             <td th:text = "${obj.description}"> </td>
             <td>
                 <a th:href="@{department/delete/{id}(id=${obj.id})}">Delete</a>
+                <a th:href="@{department/edit/{id}(id=${obj.id})}">Edit</a>
             </td>
         </tr>
         </tbody>

@@ -1,6 +1,7 @@
 package com.tn.Controller;
 
 import com.tn.DTO.DepartmentDTO;
+import com.tn.Entity.Account;
 import com.tn.Entity.Department;
 import com.tn.Repository.DepartmentRepository;
 import com.tn.Service.DepartmentService;
@@ -61,4 +62,31 @@ public class DepartmentController {
         departmentService.delete(id);
         return "redirect:/department";
     }
+
+    @GetMapping("department/edit/{id}")
+    public String edit(@PathVariable int id, Model model){
+        Department department = departmentService.getById(id);
+
+        DepartmentDTO departmentDTO = new DepartmentDTO();
+        departmentDTO.setId(department.getId());
+        departmentDTO.setDepartmentName(department.getDepartmentName());
+        departmentDTO.setDescription(department.getDescription());
+
+        model.addAttribute("departmentDTO", departmentDTO);
+        return "edit_department";
+    }
+
+    @PostMapping("department/update")
+    public String update (@RequestParam Integer id,
+                          @RequestParam String departmentName,
+                          @RequestParam String description){
+
+        Department department = departmentService.getById(id);
+        department.setDepartmentName(departmentName);
+        department.setDescription(description);
+
+        departmentService.save(department);
+        return "redirect:/department";
+    }
+
 }

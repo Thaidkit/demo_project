@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService{
@@ -45,5 +46,18 @@ public class AccountServiceImpl implements AccountService{
             throw new UsernameNotFoundException("Not find username");
         }
         return new User(username, account.getPassword(), AuthorityUtils.createAuthorityList("ROLE_" + account.getRole()));
+    }
+
+    @Override
+    public Account getById(int id){
+        Account account = accountRepository.findById(id).orElse(null);
+        return account;
+    }
+
+    @Override
+    public List<Account> search(String keyword){
+        List<Account> accounts = accountRepository.findByFullNameContainingIgnoreCaseOrUsernameContainingIgnoreCase(keyword, keyword);
+        return accounts;
+
     }
 }

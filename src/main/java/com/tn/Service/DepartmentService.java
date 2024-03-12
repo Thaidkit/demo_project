@@ -9,6 +9,6 @@ public interface DepartmentService {
 
     boolean save(Department department);
 
-    Department getById(Integer id);
+    Department getById(int id);
     boolean delete(int id);
 }
